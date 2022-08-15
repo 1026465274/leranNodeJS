@@ -1,0 +1,11 @@
+const dotenv = require('dotenv');
+dotenv.config({
+  path: './config.env',
+});
+const app = require('./app');
+
+const port = process.env.PORT || 3000;
+// 启动服务
+app.listen(port, () => {
+  console.log('listening on ');
+});
