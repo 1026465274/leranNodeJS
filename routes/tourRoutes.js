@@ -11,14 +11,15 @@ const {
 const router = express.Router();
 
 // 指定接收了某个参数才会经过这个中间件
-router.param('id', (req, res, next, val) => {
-  console.log(`Tor id is :${val}`);
-  next();
-});
+// router.param('id', (req, res, next, val) => {
+//   console.log(`Tor id is :${val}`);
+//   next();
+// });
 
 // 在post方法中多加一个中间件并且在createTour函数前调用
 
-router.route('/').get(getAllTours).post(checkBody, createTour);
+// router.route('/').get(getAllTours).post(checkBody, createTour);
+router.route('/').get(getAllTours).post(createTour);
 
 // 问号代表路由是地址可以不加
 router.get('/:id/:x?/:y?', getTour);
