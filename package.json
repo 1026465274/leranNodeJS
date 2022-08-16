@@ -4,7 +4,7 @@
   "description": "Learning node ",
   "main": "app.js",
   "scripts": {
-    "start:dev": "supervisor server.js",
+    "start": "supervisor server.js",
     "start:prod": "cross-env NODE_ENV=production supervisor server.js"
   },
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "mongoose": "^5.13.14",
     "morgan": "^1.10.0",
     "supervisor": "^0.12.0"
   },
