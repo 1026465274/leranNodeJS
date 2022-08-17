@@ -6,6 +6,7 @@ const {
   deleteTour,
   createTour,
   checkBody,
+  getTopFiveCheap,
 } = require('../controller/tourController');
 // 路由 把 tours接口 和user接口分隔开
 const router = express.Router();
@@ -16,8 +17,9 @@ const router = express.Router();
 //   next();
 // });
 
-// 在post方法中多加一个中间件并且在createTour函数前调用
+router.route('/top-5-cheap').get(getTopFiveCheap, getAllTours);
 
+// 在post方法中多加一个中间件并且在createTour函数前调用  例如post(checkBody, createTour);
 // router.route('/').get(getAllTours).post(checkBody, createTour);
 router.route('/').get(getAllTours).post(createTour);
 
