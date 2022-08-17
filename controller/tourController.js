@@ -7,8 +7,61 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   // console.log(req.requestTime);
+  // 获取查询参数
+  console.log(req.query);
+
   try {
-    allTours = await Tour.find();
+    const queryParam = { ...req.query };
+    // 1.过滤
+    //  排除某些特殊参数
+    const excParam = ['page', 'sort', 'limit', 'fields'];
+    excParam.forEach((el) => {
+      delete queryParam[el];
+    });
+    //2。大于小于的过滤
+
+    let queryStr = JSON.stringify(queryParam);
+    // gte, gt, lte,lt
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    console.log(JSON.parse(queryStr));
+
+    let tours = Tour.find(JSON.parse(queryStr));
+    // gte 大于等于
+    //  {difficulty:'easy', duration:{$gte:5}}
+
+    // 排序
+    if (req.query.sort) {
+      // 多个排序用逗号分隔 ，这里把逗号换成了 空格 传递给 sort函数
+      let sort = req.query.sort.split(',').join(' ');
+      tours.sort(sort);
+    } else {
+      tours.sort('-createdAt');
+    }
+
+    // 3.过滤 只显示传递过来的数据
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      tours.select(fields);
+    } else {
+      // - 代表不包括
+      tours.select('-__v');
+    }
+
+    // 4. 分页
+    // skip 代表跳过 传入数字
+
+    let page = Math.abs(req.query.page) || 1;
+    let limit = Math.abs(req.query.limit) || 10;
+    let skip = (page - 1) * limit;
+    tours.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      // 返回文件的数量
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist ');
+    }
+
+    allTours = await tours;
     res.status(200).json({
       requestdAt: req.requestTime,
       status: 'success',
@@ -18,9 +71,11 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (e) {
-    res.status(404).josn({
+    console.log(e);
+    res.status(404).json({
       status: 'error',
       message: e,
+      a: 1,
     });
   }
 };
@@ -44,7 +99,8 @@ exports.getTour = async (req, res) => {
   //   return el.id === id;
   // });
   try {
-    const tour = await Tour.findById(req.params.id);
+    console.log(req.params.id);
+    const tour = await Tour.findById(req.param.id);
     // findOne({_id: req.params.id} )
     res.status(200).json({
       status: 'success',

@@ -1,63 +1,62 @@
-// 使用前注释掉User.save()方法
-// node dev-data/data/import-dev-data.js --import
-// node dev-data/data/import-dev-data.js --delete
 const fs = require('fs');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Show = require('./../../models/showModel');
-const Comment = require('./../../models/commentModel');
-const User = require('./../../models/userModel');
+const mongoose = require('mongoose');
+const Tour = require('./../../models/tourModel');
+dotenv.config({
+  path: './config.env',
+});
 
-dotenv.config({ path: './config.env' });
-
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
+const DB = process.env.DATACONTENT.replace(
+  '<password>',
   process.env.DATABASE_PASSWORD
 );
 
+// 连接数据库集群
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
   })
-  .then(() => console.log('DB connection successful!'));
+  .then(
+    (con) => {
+      console.log(con.connect);
+      console.log('连接成功');
+    },
+    (err) => {
+      console.log(err);
+    }
+  );
 
-// READ JSON FILE
-const shows = JSON.parse(fs.readFileSync(`${__dirname}/shows.json`, 'utf-8'));
-const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
-const comments = JSON.parse(
-  fs.readFileSync(`${__dirname}/comments.json`, 'utf-8')
-);
+// 读取文件
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/shows.json`, 'utf-8'));
 
-// IMPORT DATA INTO DB
+// 导入到数据库
 const importData = async () => {
   try {
-    await Show.create(shows);
-    await User.create(users, { validateBeforeSave: false });
-    await Comment.create(comments);
-    console.log('Data successfully loaded!');
-  } catch (err) {
-    console.log(err);
+    await Tour.create(tours);
+    console.log('data successfully');
+  } catch (e) {
+    console.log(e);
   }
+  // 退出程序
   process.exit();
 };
 
-// DELETE ALL DATA FROM DB
+// 删除所有数据
 const deleteData = async () => {
   try {
-    await Show.deleteMany();
-    await User.deleteMany();
-    await Comment.deleteMany();
-    console.log('Data successfully deleted!');
-  } catch (err) {
-    console.log(err);
+    await Tour.deleteMany();
+  } catch (e) {
+    console.log(e);
   }
   process.exit();
 };
 
-if (process.argv[2] === '--import') {
+if (process.argv[2] == '--import') {
   importData();
-} else if (process.argv[2] === '--delete') {
+} else if (process.argv[2] == '--delete') {
   deleteData();
 }
+console.log(process.argv);

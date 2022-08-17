@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 const tourSchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    require: [true, '_id is required'],
+  },
   name: {
     type: String,
     required: [true, 'name is required'],
@@ -53,6 +57,7 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    select: false, // 再模型中设置不能查找出来
   },
   startDates: [Date],
 });

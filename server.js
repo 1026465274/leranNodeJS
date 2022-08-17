@@ -20,7 +20,7 @@ mongoose
   })
   .then(
     (con) => {
-      console.log(con.connect);
+      // console.log(con.connect);
       console.log('连接成功');
     },
     (err) => {
