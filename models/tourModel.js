@@ -25,11 +25,9 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'difficulty is required'],
       // 枚举属性
-      enum: {
-        value: ['easy', 'medium', 'difficult'],
-        message: "difficulty 要为 'easy','medium','difficult' 其中一个",
-      },
+      enum: ['easy', 'medium', 'difficult'],
     },
+
     ratingsAverage: {
       type: Number,
       default: 4.5,
@@ -72,7 +70,7 @@ const tourSchema = new mongoose.Schema(
       {
         type: Date,
         // 自定义验证属性  当返回false就是不通过
-        validate: {
+        validator: {
           function(val) {
             // 当创建时 this时指向文档中的  更新的 this不指向
             console.log(this.price);
