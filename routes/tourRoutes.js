@@ -7,6 +7,8 @@ const {
   createTour,
   checkBody,
   getTopFiveCheap,
+  getTourStats,
+  getMonthlyPlan,
 } = require('../controller/tourController');
 // 路由 把 tours接口 和user接口分隔开
 const router = express.Router();
@@ -16,6 +18,9 @@ const router = express.Router();
 //   console.log(`Tor id is :${val}`);
 //   next();
 // });
+
+router.route('/groupTour').get(getTourStats);
+router.route('/monthlyPlan/:year').get(getMonthlyPlan);
 
 router.route('/top-5-cheap').get(getTopFiveCheap, getAllTours);
 

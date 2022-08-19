@@ -107,7 +107,7 @@ exports.getTour = async (req, res) => {
   //   return el.id === id;
   // });
   try {
-    console.log(req.params.id);
+    console.log(req.params);
     const tour = await Tour.findById(req.param.id);
     // findOne({_id: req.params.id} )
     res.status(200).json({
@@ -194,4 +194,85 @@ exports.getTopFiveCheap = (req, res, next) => {
   req.query.limit = 5;
 
   next();
+};
+
+// 使用mongoose的聚合函数
+exports.getTourStats = async (req, res) => {
+  try {
+    // aggregate 聚合方法 里面传入数组
+    const tourStatus = await Tour.aggregate([
+      {
+        // $match 表示 过滤  对象中传递 过滤的条件
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: 'ratingsAverage',
+          num: { $num: 1 },
+          avgRating: { $avg: '$price' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tours: tourStatus,
+      },
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'error',
+      message: e,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const getData = await Tour.aggregate([
+      {
+        // 解构函数 把数组结构成另一份
+        $unwind: '$startDates',
+      },
+      // {
+      //   $match: {
+      //     startDates: {
+      //       $gte: new Date(),
+      //     },
+      //   },
+      // },
+
+      // {
+      //   $group: {
+      //     _id: { $month: '$startDates' },
+      //     numTourStarts: { $sum: 1 },
+      //   },
+      // },
+      // {
+      //   $addFileds: { month: '$_id' },
+      // },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tours: getData,
+      },
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'error',
+      message: e,
+    });
+  }
 };
